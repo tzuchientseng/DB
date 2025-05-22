@@ -64,14 +64,13 @@ export const useDataStore = defineStore('data', {
           });
         }
 
-        if (!response.ok) throw new Error('Failed to fetch tasks');
+        if (!response.ok) throw new Error('Failed to fetch data!');
 
         const data = await response.json();
 
         this.todoTasks = data.todo_data ?? [];
-        this.inProgressTasks = data.inProgess_data ?? [];
+        this.inProgressTasks = data.in_progress_data ?? [];
         this.noteContent = data.note_data ?? '';
-        
 
       } catch (error) {
         console.error('Error fetching:', error);
