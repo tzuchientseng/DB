@@ -1,8 +1,8 @@
 <script setup>
-import HomePage from './components/HomePage.vue'
+import TodoPage from './components/TodoPage.vue'
 </script>
 <template>
-    <HomePage />
+    <TodoPage />
 </template>
 
 <style scoped>
