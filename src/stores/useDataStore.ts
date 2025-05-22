@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 
-const API_BASE_URL = 'https://home.sunnytseng.com/api'
+// const API_BASE_URL = 'https://home.sunnytseng.com/api' // Deploy to server
+const API_BASE_URL = '/api'
 
 export interface Task {
   goal: string
@@ -47,7 +48,7 @@ export const useDataStore = defineStore('data', {
       }
     },
 
-    async fetchTask(): Promise<void> {
+    async fetchData(): Promise<void> {
       try {
         if (!this.token) await this.login();
 
@@ -67,9 +68,10 @@ export const useDataStore = defineStore('data', {
 
         const data = await response.json();
 
-        this.todoTasks = data.todoTasks ?? [];
-        this.inProgressTasks = data.inProgressTasks ?? [];
+        this.todoTasks = data.todo_data ?? [];
+        this.inProgressTasks = data.inProgess_data ?? [];
         this.noteContent = data.note_data ?? '';
+        
 
       } catch (error) {
         console.error('Error fetching:', error);
