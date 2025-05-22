@@ -3,6 +3,8 @@ import { defineStore } from 'pinia'
 // const API_URL = 'https://home.sunnytseng.com/api/' // `npm run deploy`
 const API_URL = 'api/';
 
+const API_BASE_URL = 'https://home.sunnytseng.com/api'
+
 export interface Task {
   goal: string
   purpose: string
@@ -27,36 +29,41 @@ export const useTodoStore = defineStore('todo', {
 
   actions: {
     async login(): Promise<void> {
-      const res = await fetch(`${API_BASE_URL}/login/`, {
+      const response = await fetch(`${API_BASE_URL}/login/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: 'sunny', password: 'open' })
       })
-      if (!res.ok) throw new Error('Login failed')
-      const data = await res.json()
+      if (!response.ok) throw new Error('Login failed')
+      const data = await response.json()
       this.token = data.access
     },
 
     async fetchTasks(): Promise<void> {
-      if (!this.token) await this.login()
+      try {
+        if (!this.token) await this.login()
 
-      let res = await fetch(`${API_BASE_URL}/get-toDoNotes/`, {
-        headers: { Authorization: `Bearer ${this.token}` }
-      })
-
-      if (res.status === 401) {
-        await this.login()
-        res = await fetch(`${API_BASE_URL}/get-toDoNotes/`, {
+        let res = await fetch(`${API_BASE_URL}/get-toDoNotes/`, {
           headers: { Authorization: `Bearer ${this.token}` }
         })
+
+        if (res.status === 401) {
+          await this.login()
+          res = await fetch(`${API_BASE_URL}/get-toDoNotes/`, {
+            headers: { Authorization: `Bearer ${this.token}` }
+          })
+        }
+
+        if (!res.ok) throw new Error('Failed to fetch tasks')
+        const data = await res.json()
+
+        this.todoTasks = data.todo_data ?? []
+        this.noteContent = data.note_data ?? ''
+        this.inProgressTasks = JSON.parse(localStorage.getItem('inProgressTasks') || '[]')
+      } catch (error) {
+        console.error('Error fetching tasks:', error)
+        // Optionally set error state, or show user feedback here
       }
-
-      if (!res.ok) throw new Error('Failed to fetch tasks')
-      const data = await res.json()
-
-      this.todoTasks = data.todo_data ?? []
-      this.noteContent = data.note_data ?? ''
-      this.inProgressTasks = JSON.parse(localStorage.getItem('inProgressTasks') || '[]')
     },
 
     async saveTasks(): Promise<void> {

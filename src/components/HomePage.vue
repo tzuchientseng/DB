@@ -1,4 +1,8 @@
 <script setup>
+import { useDataStore } from '@/stores/useDataStore'
+
+const dataStore = useDataStore()
+
 </script>
 
 <template>
