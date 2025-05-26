@@ -76,8 +76,66 @@ export const useDataStore = defineStore('data', {
       } catch (error) {
         console.error('Error fetching:', error);
       }
-    }
-  }
-});
+    },
 
+    async saveTask(): Promise<void> {
+      if (!this.token) await this.login();
+
+      const payload = {
+        todo_data: this.todoTasks,
+        note_data: this.noteContent,
+      };
+
+      try {
+        let response = await fetch(`${API_BASE_URL}/save-toDoNotes/`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (response.status === 401) {
+          console.warn('Token expired or invalid, retrying login...');
+          await this.login();
+          response = await fetch(`${API_BASE_URL}/save-toDoNotes/`, {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${this.token}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+          });
+        }
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Failed to save: ${response.status} - ${errorText}`);
+        }
+
+        console.log("Data saved successfully.");
+      } catch (error) {
+        console.error(`Failed to save task: ${error instanceof Error ? error.message : error}`, error);
+      }
+    },
+
+    addTask(task: Task): void {
+      this.todoTasks.unshift(task)
+    },
+
+    moveToInProgress(task: Task): void {
+      this.inProgess_data.unshift(task)
+      this.todoTasks.filter(t => JSON.stringify(t) !== JSON.stringify(task))
+    },
+
+    removeFromInProgress(task: Task): void {
+      this.inProgressTasks = this.inProgressTasks.filter(t => JSON.stringify(t) !== JSON.stringify(task))
+    },
+
+    clearInprogress(): void {
+      this.inProgressTasks = [];
+    },
+  },
+});
 
