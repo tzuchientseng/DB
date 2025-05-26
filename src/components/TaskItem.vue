@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { defineProps, defineEmits } from 'vue'
-import Swal from 'sweetalert2'
+import Swal from "sweetalert2";
 
 const props = defineProps<{
   task: {
@@ -19,19 +19,24 @@ function handleButtonClick() {
 }
 
 async function handleEdit() {
-  const initial = `${props.task.goal}, ${props.task.purpose}, ${props.task.todo}, ${props.task.timing}`
+  const initialValue = `${props.task.goal}, ${props.task.purpose}, ${props.task.todo}, ${props.task.timing}`
 
   const result = await Swal.fire({
     title: 'Edit Task',
     input: 'text',
     inputPlaceholder: 'Goal, Purpose, Todo, Timing',
-    inputValue: initial,
+    inputValue: initialValue,
     showCancelButton: true,
+    confirmButtonColor: '#3085d6',
     confirmButtonText: 'Save',
     inputValidator: (value) => {
-      const values = value.split(',')
-      if (values.length !== 4) return 'Please enter 4 values separated by commas'
-      return null
+      if (!value) {
+          return 'Please enter task content';
+      }
+      const values = value.split(',');
+      if (values.length !== 4) {
+          return 'Please ensure four items are entered, separated by commas';
+      }
     }
   })
 
