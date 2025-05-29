@@ -7,18 +7,22 @@ const dataStore = useDataStore()
 
 onMounted(() => { dataStore.fetchData() })
 
-function moveTask(params): void {
-  
+function moveTask(params: any): void {
+  void params // 假裝使用，避免報錯
 }
 
-function update(params): void {
-  
+function update(params: any): void {
+  void params
 }
+
 
 </script>
 
 <template>
-<ul class="list-group" id="todo-list">
+  <h1>
+    test
+  </h1>
+<!-- <ul class="list-group" id="todo-list">
   <TaskItem
     v-for="(task, index) in dataStore.todoTasks"
     :key="'todo-' + index"
@@ -38,6 +42,6 @@ function update(params): void {
     @move="moveTask(task, 'inProgress')"
     @update="updateTask(dataStore.inProgressTasks, index, $event)"
   />
-</ul>
+</ul> -->
 </template>
 

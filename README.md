@@ -1,12 +1,34 @@
 # My DB Website
 
-## Project setup
+## ✨ Features
 
-`npm install @vitejs/plugin-vue-jsx --save-dev`
+- 📝 Todo-List / Notes
+- 📖 Magic Lesson Notes
+  <!-- - 🔍 Search and filter notes easily -->
+  <!-- - 🎨 User-friendly interface with Vue 3 and Docdify -->
+  <!-- - ⚡ Fast and optimized with Vite -->
 
-`npm install pinia`
+## 🛠️ Tech Stack
 
-`npm install sweetalert2`
+- **Frontend:** Vue 3, Vite, Docsify
+- **Styling:** CSS (or specify your framework, e.g., Tailwind CSS, Bootstrap)
+- **Build & Deployment:** Vite, GitHub Pages
 
-`npm install sortablejs`
+## 📦 Project Setup
 
+```sh
+npm install
+
+npm install vue-router@4
+
+npm install -g gh-pages
+npm i docsify
+# npm i -g docsify-cli
+
+npm install @vitejs/plugin-vue-jsx --save-dev
+npm install pinia
+npm install sweetalert2
+npm install sortablejs
+npm install --save-dev @types/node
+npm install --save-dev eslint eslint-plugin-vue @vue/eslint-config-typescript @vue/eslint-config-prettier
+```
