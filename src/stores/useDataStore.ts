@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 
-const API_BASE_URL = 'https://home.sunnytseng.com/api'
+// const API_BASE_URL = 'https://home.sunnytseng.com/api' // Deploy to server
+const API_BASE_URL = '/api'
 
 export interface Task {
   goal: string
@@ -47,7 +48,7 @@ export const useDataStore = defineStore('data', {
       }
     },
 
-    async fetchTask(): Promise<void> {
+    async fetchData(): Promise<void> {
       try {
         if (!this.token) await this.login();
 
@@ -67,15 +68,74 @@ export const useDataStore = defineStore('data', {
 
         const data = await response.json();
 
-        this.todoTasks = data.todoTasks ?? [];
-        this.inProgressTasks = data.inProgressTasks ?? [];
+        this.todoTasks = data.todo_data ?? [];
+        this.inProgressTasks = data.in_progress_data ?? [];
         this.noteContent = data.note_data ?? '';
+        
 
       } catch (error) {
         console.error('Error fetching:', error);
       }
-    }
-  }
-});
+    },
 
+    async saveTask(): Promise<void> {
+      if (!this.token) await this.login();
+
+      const payload = {
+        todo_data: this.todoTasks,
+        note_data: this.noteContent,
+      };
+
+      try {
+        let response = await fetch(`${API_BASE_URL}/save-toDoNotes/`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (response.status === 401) {
+          console.warn('Token expired or invalid, retrying login...');
+          await this.login();
+          response = await fetch(`${API_BASE_URL}/save-toDoNotes/`, {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${this.token}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+          });
+        }
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Failed to save: ${response.status} - ${errorText}`);
+        }
+
+        console.log("Data saved successfully.");
+      } catch (error) {
+        console.error(`Failed to save task: ${error instanceof Error ? error.message : error}`, error);
+      }
+    },
+
+    addTask(task: Task): void {
+      this.todoTasks.unshift(task)
+    },
+
+    moveToInProgress(task: Task): void {
+      this.inProgressTasks.unshift(task)
+      this.todoTasks.filter(t => JSON.stringify(t) !== JSON.stringify(task))
+    },
+
+    removeFromInProgress(task: Task): void {
+      this.inProgressTasks = this.inProgressTasks.filter(t => JSON.stringify(t) !== JSON.stringify(task))
+    },
+
+    clearInprogress(): void {
+      this.inProgressTasks = [];
+    },
+  },
+});
 
